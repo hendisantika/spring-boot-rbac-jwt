@@ -81,4 +81,23 @@ public class UserService implements UserDetailsService {
         nUser.setRoles(roleSet);
         return userRepository.save(nUser);
     }
+
+    public User createEmployee(UserDto user) {
+        User nUser = user.getUserFromDto();
+        nUser.setPassword(bcryptEncoder.encode(user.getPassword()));
+
+        Role employeeRole = roleService.findByName("EMPLOYEE");
+        Role customerRole = roleService.findByName("USER");
+
+        Set<Role> roleSet = new HashSet<>();
+        if (employeeRole != null) {
+            roleSet.add(employeeRole);
+        }
+        if (customerRole != null) {
+            roleSet.add(customerRole);
+        }
+
+        nUser.setRoles(roleSet);
+        return userRepository.save(nUser);
+    }
 }
