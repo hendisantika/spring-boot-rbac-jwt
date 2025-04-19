@@ -52,4 +52,8 @@ public class TokenProvider implements Serializable {
                 .getBody();
     }
 
+    private Boolean isTokenExpired(String token) {
+        final Date expiration = getExpirationDateFromToken(token);
+        return expiration.before(new Date());
+    }
 }
