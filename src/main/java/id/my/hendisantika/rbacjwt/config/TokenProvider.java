@@ -1,5 +1,6 @@
 package id.my.hendisantika.rbacjwt.config;
 
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -28,4 +29,7 @@ public class TokenProvider implements Serializable {
     @Value("${jwt.authorities.key}")
     public String AUTHORITIES_KEY;
 
+    public String getUsernameFromToken(String token) {
+        return getClaimFromToken(token, Claims::getSubject);
+    }
 }
