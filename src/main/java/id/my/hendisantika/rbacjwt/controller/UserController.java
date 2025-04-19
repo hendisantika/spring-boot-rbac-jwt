@@ -85,4 +85,15 @@ public class UserController {
     public String adminPing() {
         return "Only Admins Can Read This";
     }
+
+    /**
+     * Returns a message that can be accessed by any user.
+     *
+     * @return A message that can be accessed by any user.
+     */
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping(value = "/userping")
+    public String userPing() {
+        return "Any User Can Read This";
+    }
 }
