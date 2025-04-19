@@ -96,4 +96,10 @@ public class UserController {
     public String userPing() {
         return "Any User Can Read This";
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping(value = "/create/employee")
+    public User createEmployee(@RequestBody UserDto user) {
+        return userService.createEmployee(user);
+    }
 }
