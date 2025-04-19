@@ -1,5 +1,6 @@
 package id.my.hendisantika.rbacjwt.service;
 
+import id.my.hendisantika.rbacjwt.model.Role;
 import id.my.hendisantika.rbacjwt.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,4 +20,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RoleService {
     private RoleRepository roleRepository;
+
+    public Role findByName(String name) {
+        Role role = roleRepository.findRoleByName(name);
+        return role;
+    }
 }
