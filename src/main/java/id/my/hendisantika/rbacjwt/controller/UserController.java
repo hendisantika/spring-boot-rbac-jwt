@@ -8,12 +8,14 @@ import id.my.hendisantika.rbacjwt.model.UserDto;
 import id.my.hendisantika.rbacjwt.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -71,5 +73,16 @@ public class UserController {
     @PostMapping(value = "/register")
     public User saveUser(@RequestBody UserDto user) {
         return userService.save(user);
+    }
+
+    /**
+     * Returns a message that can only be accessed by users with the 'ADMIN' role.
+     *
+     * @return A message that can only be accessed by admins.
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/adminping")
+    public String adminPing() {
+        return "Only Admins Can Read This";
     }
 }
