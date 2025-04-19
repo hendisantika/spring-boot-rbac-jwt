@@ -56,4 +56,8 @@ public class UserService implements UserDetailsService {
         userRepository.findAll().iterator().forEachRemaining(list::add);
         return list;
     }
+
+    public User findOne(String username) {
+        return userRepository.findByUsername(username);
+    }
 }
