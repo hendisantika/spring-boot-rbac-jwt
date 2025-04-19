@@ -1,10 +1,19 @@
 package id.my.hendisantika.rbacjwt.controller;
 
 import id.my.hendisantika.rbacjwt.config.TokenProvider;
+import id.my.hendisantika.rbacjwt.model.AuthToken;
+import id.my.hendisantika.rbacjwt.model.LoginUser;
 import id.my.hendisantika.rbacjwt.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,4 +39,24 @@ public class UserController {
     private final TokenProvider jwtTokenUtil;
 
     private final UserService userService;
+
+    /**
+     * Generates a token for the given user credentials.
+     *
+     * @param loginUser The user's login credentials.
+     * @return A response entity containing the generated token.
+     * @throws AuthenticationException if authentication fails.
+     */
+    @PostMapping(value = "/authenticate")
+    public ResponseEntity<?> generateToken(@RequestBody LoginUser loginUser) throws AuthenticationException {
+        final Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginUser.getUsername(),
+                        loginUser.getPassword()
+                )
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        final String token = jwtTokenUtil.generateToken(authentication);
+        return ResponseEntity.ok(new AuthToken(token));
+    }
 }
