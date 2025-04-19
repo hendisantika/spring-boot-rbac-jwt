@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * Project : spring-boot-rbac-jwt
@@ -101,5 +103,11 @@ public class UserController {
     @PostMapping(value = "/create/employee")
     public User createEmployee(@RequestBody UserDto user) {
         return userService.createEmployee(user);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/find/all")
+    public List<User> getAllList() {
+        return userService.findAll();
     }
 }
