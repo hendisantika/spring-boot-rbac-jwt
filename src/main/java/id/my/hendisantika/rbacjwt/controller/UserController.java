@@ -3,6 +3,8 @@ package id.my.hendisantika.rbacjwt.controller;
 import id.my.hendisantika.rbacjwt.config.TokenProvider;
 import id.my.hendisantika.rbacjwt.model.AuthToken;
 import id.my.hendisantika.rbacjwt.model.LoginUser;
+import id.my.hendisantika.rbacjwt.model.User;
+import id.my.hendisantika.rbacjwt.model.UserDto;
 import id.my.hendisantika.rbacjwt.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -58,5 +60,16 @@ public class UserController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         final String token = jwtTokenUtil.generateToken(authentication);
         return ResponseEntity.ok(new AuthToken(token));
+    }
+
+    /**
+     * Saves a new user.
+     *
+     * @param user The user to be saved.
+     * @return The saved user.
+     */
+    @PostMapping(value = "/register")
+    public User saveUser(@RequestBody UserDto user) {
+        return userService.save(user);
     }
 }
