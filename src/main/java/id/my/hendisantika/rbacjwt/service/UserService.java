@@ -1,6 +1,8 @@
 package id.my.hendisantika.rbacjwt.service;
 
+import id.my.hendisantika.rbacjwt.model.Role;
 import id.my.hendisantika.rbacjwt.model.User;
+import id.my.hendisantika.rbacjwt.model.UserDto;
 import id.my.hendisantika.rbacjwt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -59,5 +61,24 @@ public class UserService implements UserDetailsService {
 
     public User findOne(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    public User save(UserDto user) {
+        User nUser = user.getUserFromDto();
+        nUser.setPassword(bcryptEncoder.encode(user.getPassword()));
+
+        // Set default role as USER
+        Role role = roleService.findByName("USER");
+        Set<Role> roleSet = new HashSet<>();
+        roleSet.add(role);
+
+        // If email domain is admin.edu, add ADMIN role
+        if (nUser.getEmail().split("@")[1].equals("admin.edu")) {
+            role = roleService.findByName("ADMIN");
+            roleSet.add(role);
+        }
+
+        nUser.setRoles(roleSet);
+        return userRepository.save(nUser);
     }
 }
