@@ -1,8 +1,11 @@
 package id.my.hendisantika.rbacjwt.service;
 
+import id.my.hendisantika.rbacjwt.model.User;
 import id.my.hendisantika.rbacjwt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,4 +29,11 @@ public class UserService implements UserDetailsService {
 
     private final BCryptPasswordEncoder bcryptEncoder;
 
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("Invalid username or password.");
+        }
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), getAuthority(user));
+    }
 }
