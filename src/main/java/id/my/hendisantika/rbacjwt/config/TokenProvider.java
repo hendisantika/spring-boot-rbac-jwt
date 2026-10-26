@@ -64,11 +64,11 @@ public class TokenProvider implements Serializable {
     }
 
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -82,10 +82,10 @@ public class TokenProvider implements Serializable {
                 .collect(Collectors.joining(","));
 
         return Jwts.builder()
-                .setSubject(authentication.getName())
+                .subject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 1000))
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 1000))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -96,13 +96,13 @@ public class TokenProvider implements Serializable {
     }
 
     public UsernamePasswordAuthenticationToken getAuthenticationToken(final String token, final Authentication existingAuth, final UserDetails userDetails) {
-        final JwtParser jwtParser = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+        final JwtParser jwtParser = Jwts.parser()
+                .verifyWith(getSigningKey())
                 .build();
 
-        final Jws<Claims> claimsJws = jwtParser.parseClaimsJws(token);
+        final Jws<Claims> claimsJws = jwtParser.parseSignedClaims(token);
 
-        final Claims claims = claimsJws.getBody();
+        final Claims claims = claimsJws.getPayload();
 
         final Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
