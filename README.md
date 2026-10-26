@@ -1,5 +1,10 @@
 # Spring Boot RBAC JWT
 
+[![Java CI with Maven](https://github.com/hendisantika/spring-boot-rbac-jwt/actions/workflows/maven.yml/badge.svg)](https://github.com/hendisantika/spring-boot-rbac-jwt/actions/workflows/maven.yml)
+![Java](https://img.shields.io/badge/Java-25-orange?logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-brightgreen?logo=springboot)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-blue?logo=dependabot)](.github/dependabot.yml)
+
 A Spring Boot application demonstrating Role-Based Access Control (RBAC) with JSON Web Token (JWT) authentication.
 
 ## Table of Contents
@@ -10,6 +15,9 @@ A Spring Boot application demonstrating Role-Based Access Control (RBAC) with JS
 - [API Documentation](#api-documentation)
 - [Authentication Flow](#authentication-flow)
 - [Testing the API](#testing-the-api)
+- [Running the Tests](#running-the-tests)
+- [Continuous Integration](#continuous-integration)
+- [Dependency Updates](#dependency-updates)
 
 ## Overview
 
@@ -22,21 +30,22 @@ This project is a RESTful API built with Spring Boot that implements:
 
 ## Technologies Used
 
-- Java 17
-- Spring Boot
-- Spring Security
-- JWT (JSON Web Token)
+- Java 25
+- Spring Boot 4.1
+- Spring Security 7
+- JWT (JSON Web Token) via [JJWT](https://github.com/jwtk/jjwt) 0.13
 - JPA / Hibernate
-- MySQL
-- Maven
+- MySQL (H2 for tests)
+- Lombok
+- Maven (via the bundled Maven Wrapper)
 
 ## Setup
 
 ### Prerequisites
 
-- JDK 17 or higher
-- Maven
-- MySQL
+- JDK 25
+- MySQL 8+
+- Maven is optional: use the bundled wrapper (`./mvnw`)
 
 ### Database Setup
 
@@ -55,6 +64,14 @@ spring.datasource.username=yu71
 spring.datasource.password=53cret
 ```
 
+3. Set a strong JWT signing key. The token is signed with HMAC-SHA, which requires a key of **at least 32 bytes
+   (256 bits)**; shorter keys are rejected by JJWT with a `WeakKeyException`:
+
+```properties
+jwt.signing.key=change-me-to-a-secret-of-at-least-32-bytes
+jwt.token.validity=18000
+```
+
 ### Building and Running the Application
 
 1. Clone the repository
@@ -67,19 +84,19 @@ cd spring-boot-rbac-jwt
 2. Build the application
 
 ```bash
-mvn clean install
+./mvnw clean install
 ```
 
 3. Run the application
 
 ```bash
-mvn spring:boot run
+./mvnw spring-boot:run
 ```
 
 or
 
 ```bash
-java -jar target/spring-boot-rbac-jwt-0.0.1-SNAPSHOT.jar
+java -jar target/rbac-jwt-0.0.1-SNAPSHOT.jar
 ```
 
 The application will start on port 8080.
@@ -273,6 +290,36 @@ curl -X GET http://localhost:8080/users/userping \
    - Headers:
       - Key: Authorization
       - Value: Bearer YOUR_TOKEN_HERE
+
+## Running the Tests
+
+The test suite uses an in-memory H2 database, so no MySQL instance is needed:
+
+```bash
+./mvnw test
+```
+
+## Continuous Integration
+
+GitHub Actions ([`.github/workflows/maven.yml`](.github/workflows/maven.yml)) runs on every push and pull request
+to `main` (and can be triggered manually):
+
+- **build**: sets up Temurin JDK 25 with Maven caching and runs `./mvnw -B package` (compile + tests)
+- **dependency-graph**: on pushes to `main` only, submits the Maven dependency graph to GitHub to improve
+  Dependabot security alerts
+
+The workflow uses read-only permissions by default and cancels superseded runs on the same branch.
+
+## Dependency Updates
+
+[Dependabot](.github/dependabot.yml) checks daily at 05:00 (Asia/Jakarta) for:
+
+| Ecosystem      | Grouping                                                                                  | Commit prefix                    |
+|----------------|-------------------------------------------------------------------------------------------|----------------------------------|
+| Maven          | `spring-boot`, `jjwt`, `maven-wrapper`, plus one group for all other minor/patch updates | `build(deps)` / `build(deps-dev)` |
+| GitHub Actions | all actions in a single PR                                                                | `ci(deps)`                       |
+
+Pull requests are labelled `dependencies` plus `java` or `github_actions`.
 
 ## License
 

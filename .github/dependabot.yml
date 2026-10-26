@@ -7,10 +7,48 @@ updates:
       time: '05:00'
       timezone: Asia/Jakarta
     open-pull-requests-limit: 10
-  - package-ecosystem: "github-actions"
+    target-branch: main
+    labels:
+      - dependencies
+      - java
+    commit-message:
+      prefix: "build(deps)"
+      prefix-development: "build(deps-dev)"
+      include: scope
+    groups:
+      # Spring Boot parent, starters and plugins move together
+      spring-boot:
+        patterns:
+          - "org.springframework.boot*"
+      jjwt:
+        patterns:
+          - "io.jsonwebtoken*"
+      maven-wrapper:
+        patterns:
+          - "org.apache.maven*"
+      # Everything else: bundle minor and patch bumps into a single PR
+      maven-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: daily
       time: '05:00'
       timezone: Asia/Jakarta
     open-pull-requests-limit: 10
+    target-branch: main
+    labels:
+      - dependencies
+      - github_actions
+    commit-message:
+      prefix: "ci(deps)"
+      include: scope
+    groups:
+      github-actions:
+        patterns:
+          - "*"
